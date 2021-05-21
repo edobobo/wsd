@@ -1,0 +1,16 @@
+# common params
+transformer_model: bert-base-cased
+
+pl_module:
+  _target_: src.pl_modules.simple_transformer.SimpleTransformerPLModule
+
+text_encoder:
+  _target_: src.disambiguators.simple_transformer.TransformerEncoder
+  transformer_model: ${model.transformer_model}
+  fine_tune: False
+  bpes_merging_strategy:
+    _target_: src.disambiguators.simple_transformer.AverageBPES
+
+classification_head:
+  _target_: src.disambiguators.simple_transformer.LinearClassificationHead
+  hidden_compression: 128

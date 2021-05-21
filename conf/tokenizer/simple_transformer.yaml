@@ -1,0 +1,3 @@
+simple_transformer_tokenizer:
+    _target_: src.tokenizers.simple_transformer.SimpleTransformerTokenizer
+    transformer_model: ${model.transformer_model}
