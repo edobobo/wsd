@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import NamedTuple, Optional, List, Tuple, Callable
 
 import torch
-from transformers import AutoModel
+from transformers import AutoModel, AutoConfig
 
 
 class TextEncoder(ABC, torch.nn.Module):
@@ -60,15 +60,21 @@ class TransformerEncoder(TextEncoder):
         transformer_model: str,
         fine_tune: bool,
         bpes_merging_strategy: Callable[[List[torch.Tensor]], torch.Tensor],
+        use_last_n_layers: int = 1
     ):
         super().__init__()
-        self._encoder = AutoModel.from_pretrained(transformer_model)
+
+        # load encoder
+        auto_config = AutoConfig.from_pretrained(transformer_model)
+        auto_config.output_hidden_states = True
+        self._encoder = AutoModel.from_pretrained(transformer_model, config=auto_config)
 
         if not fine_tune:
             for param in self._encoder.parameters():
                 param.requires_grad = False
 
         self.bpes_merging_strategy = bpes_merging_strategy
+        self.use_last_n_layers = use_last_n_layers
 
     def forward(
         self,
@@ -77,7 +83,8 @@ class TransformerEncoder(TextEncoder):
         instances_offsets: List[List[Tuple[int, int]]],
         **kwargs
     ) -> torch.Tensor:
-        encoded_bpes = self._encoder(input_ids, attention_mask)[0]
+        encoded_bpes = torch.cat(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers:], dim=-1)
+
         max_instances = max(map(len, instances_offsets))
         encoded_instances = torch.zeros(
             (input_ids.shape[0], max_instances, encoded_bpes.shape[-1]),
@@ -92,7 +99,7 @@ class TransformerEncoder(TextEncoder):
         return encoded_instances
 
     def hidden_size(self) -> int:
-        return self._encoder.config.hidden_size
+        return self._encoder.config.hidden_size * self.use_last_n_layers
 
 
 class LinearClassificationHead(ClassificationHead):

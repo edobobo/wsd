@@ -28,10 +28,11 @@ class SenseVocabulary:
 
     def __init__(self, labels_idx: Dict[Any, int]):
         self.labels2idx = labels_idx
+        self.labels2idx["[$idk$]"] = len(self.labels2idx)
         self.idx2labels = {v: k for k, v in self.labels2idx.items()}
 
     def get_label(self, index: int) -> Optional[Any]:
-        return self.idx2labels.get(index, None)
+        return self.idx2labels.get(index, "[$idk$]")
 
     def get_index(self, label: Any) -> Optional[int]:
         return self.labels2idx.get(label, None)
