@@ -1,12 +1,14 @@
-import os
 import shutil
+from logging import getLogger
 from pathlib import Path
 
 from pytorch_lightning.callbacks import ModelCheckpoint
 
+logger = getLogger(__name__)
+
 
 class ModelCheckpointWithBest(ModelCheckpoint):
-    """A callback that explictly saves the best checkpoint with best.ckpt.
+    """A callback that explicitly saves the best checkpoint with best.ckpt.
     Note that the best checkpoint is duplicated, rather than linked, in best.ckpt
     """
 

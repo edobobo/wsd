@@ -188,3 +188,13 @@ class RaganatoBuilder:
             for gold_sense in self.gold_senses:
                 f_labels.write(" ".join(gold_sense))
                 f_labels.write("\n")
+
+
+def framework_evaluate(framework_folder: str, gold_file_path: str, pred_file_path: str) -> Tuple[float, float, float]:
+    scorer_folder = f"{framework_folder}/Evaluation_Datasets"
+    command_output = execute_bash_command(
+        f"[ ! -e {scorer_folder}/Scorer.class ] && javac -d {scorer_folder} {scorer_folder}/Scorer.java; java -cp {scorer_folder} Scorer {gold_file_path} {pred_file_path}"
+    )
+    command_output = command_output.split("\n")
+    p, r, f1 = [float(command_output[i].split("=")[-1].strip()[:-1]) for i in range(3)]
+    return p, r, f1

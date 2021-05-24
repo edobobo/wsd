@@ -59,8 +59,8 @@ class WordNetCorpus(DisambiguationCorpus):
     def __init__(
         self,
         raganato_path: str,
-        materialize: bool,
-        cached: bool,
+        materialize: bool = False,
+        cached: bool = False,
         shuffle: bool = False,
         is_doc_based: bool = True,
         is_train: bool = False,

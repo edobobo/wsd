@@ -61,7 +61,7 @@ class BaseDataset(IterableDataset):
             logger.warning("If you set prebatch to False the shuffle parameters has no effect")
 
     def prebatch_elements(self, dataset_elements: list) -> list:
-        # todo: too many magic numbers in this block of the code.
+        # todo: too many magic numbers in this block of code.
         if self.shuffle:
             dataset_elements = sorted(
                 dataset_elements,

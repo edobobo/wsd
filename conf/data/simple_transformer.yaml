@@ -6,7 +6,7 @@ sense_inventory:
   wn_candidates_path: "data/WSD_Evaluation_Framework/Data_Validation/candidatesWN30.txt"
 
 train_dataset:
-  _target_: src.datasets.simple_transformer.SimpleWSDDataset
+  _target_: src.datasets.simple_transformer.SimpleTransformerDataset
   disambiguation_corpus:
     _target_: src.disambiguation_corpora.WordNetCorpus
     raganato_path: "data/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor"
@@ -23,7 +23,7 @@ train_dataset:
   shuffle: True
 
 validation_dataset:
-  _target_: src.datasets.simple_transformer.SimpleWSDDataset
+  _target_: src.datasets.simple_transformer.SimpleTransformerDataset
   disambiguation_corpus:
     _target_: src.disambiguation_corpora.WordNetCorpus
     raganato_path: "data/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2007/semeval2007"

@@ -1,0 +1,31 @@
+# module info
+module_class: src.pl_modules.simple_transformer.SimpleTransformerPLModule
+module_ckpt: null
+
+device: 0
+
+framework_dir: data/WSD_Evaluation_Framework
+raganato_path: ${test.framework_dir}/Evaluation_Datasets/semeval2007/semeval2007
+gold_keys_path: ${test.raganato_path}.gold.key.txt
+
+sense_inventory:
+  _target_: src.sense_inventories.WordNetSenseInventory
+  wn_candidates_path: data/WSD_Evaluation_Framework/Data_Validation/candidatesWN30.txt
+
+predictor:
+  _target_: src.predictors.simple_transformer.SimpleTransformerPredictor
+  module: null
+  tokenizer: null
+  sense_inventory: ${test.sense_inventory}
+  sense_vocabulary: null
+  cat_senses: True
+  tokens_per_batch: 4096
+
+disambiguation_corpus:
+  _target_: src.disambiguation_corpora.WordNetCorpus
+  raganato_path: ${test.raganato_path}
+  materialize: False
+  cached: False
+  shuffle: False
+  is_doc_based: True
+  is_train: False

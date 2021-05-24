@@ -34,7 +34,9 @@ class SimpleTransformerPLModule(pl.LightningModule):
         labels: Optional[torch.Tensor],
         **kwargs,
     ) -> dict:
-        classification_output: ClassificationOutput = self.disambiguator(input_ids, attention_mask, instances_offsets, labels)
+        classification_output: ClassificationOutput = self.disambiguator(
+            input_ids, attention_mask, instances_offsets, labels
+        )
 
         output_dict = {
             "logits": classification_output.output_logits,

@@ -1,25 +1,22 @@
 import random
-from typing import List, Optional, Callable, Iterable, Dict, Any, Union, Iterator
+from typing import List, Optional, Iterable, Dict, Any
 
 import torch
 
-from src.disambiguation_corpora import DisambiguationSentence, DisambiguationInstance
+from src.disambiguation_corpora import DisambiguationCorpus
+from src.sense_inventories import SenseInventory
 from src.tokenizers.simple_transformer import SimpleTransformerTokenizer
 from src.utils.base_dataset import BaseDataset, batchify
 from src.utils.sense_vocabulary import SenseVocabulary
 
 
-class SimpleWSDSentence:
-    text: List[str]
-    disambiguation_instances: List[DisambiguationInstance]
-
-
-class SimpleWSDDataset(BaseDataset):
+class SimpleTransformerDataset(BaseDataset):
     def __init__(
         self,
-        disambiguation_corpus: Iterator[DisambiguationSentence],
+        disambiguation_corpus: DisambiguationCorpus,
         tokenizer: SimpleTransformerTokenizer,
         sense_vocabulary: SenseVocabulary,
+        sense_inventory: SenseInventory,
         tokens_per_batch: int,
         max_batch_size: Optional[int],
         main_field: str,
@@ -42,6 +39,7 @@ class SimpleWSDDataset(BaseDataset):
         self.disambiguation_corpus = disambiguation_corpus
         self.tokenizer = tokenizer
         self.sense_vocabulary = sense_vocabulary
+        self.sense_inventory = sense_inventory
         self.__init_fields_batcher()
 
     def __init_fields_batcher(self) -> None:
@@ -54,6 +52,7 @@ class SimpleWSDDataset(BaseDataset):
             "comprehensive_labels": None,
             "sentence_id": None,
             "instance_ids": None,
+            "possible_candidates": None,
         }
 
     def dataset_iterator_func(self) -> Iterable[Dict[str, Any]]:
@@ -82,6 +81,10 @@ class SimpleWSDDataset(BaseDataset):
                 "tokens_offsets": tokens_offsets,
                 "sentence_id": disambiguation_sentence.sentence_id,
                 "instance_ids": [di.instance_id for di in disambiguation_sentence.instances],
+                "possible_candidates": [
+                    self.sense_inventory.get_possible_senses(di.lemma, di.pos) if di.instance_id is not None else None
+                    for di in disambiguation_sentence.instances
+                ],
             }
 
             labels = []
@@ -93,7 +96,7 @@ class SimpleWSDDataset(BaseDataset):
 
             if len(labels) > 0:
                 batch_elem["labels"] = torch.tensor(
-                    [self.sense_vocabulary.get_index(l) for l in labels], dtype=torch.long
+                    [self.sense_vocabulary.get_index(label) for label in labels], dtype=torch.long
                 )
                 batch_elem["comprehensive_labels"] = comprehensive_labels
 

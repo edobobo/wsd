@@ -26,6 +26,7 @@ class SimpleTransformerPLDataModule(pl.LightningDataModule):
             self.train_dataset = hydra.utils.instantiate(
                 self.conf.data.train_dataset,
                 tokenizer=self.tokenizer,
+                sense_inventory=self.sense_inventory,
                 sense_vocabulary=self.sense_vocabulary,
                 max_length=self.tokenizer.max_length,
             )
@@ -33,6 +34,7 @@ class SimpleTransformerPLDataModule(pl.LightningDataModule):
             self.validation_dataset = hydra.utils.instantiate(
                 self.conf.data.validation_dataset,
                 tokenizer=self.tokenizer,
+                sense_inventory=self.sense_inventory,
                 sense_vocabulary=self.sense_vocabulary,
                 max_length=self.tokenizer.max_length,
             )

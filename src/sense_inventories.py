@@ -48,7 +48,7 @@ class WordNetSenseInventory(SenseInventory):
         return gloss_from_sense_key(sense)
 
     def get_all_senses(self) -> List[str]:
-        return list(set(flatten(self.lemmapos2senses.values())))
+        return sorted(list(set(flatten(self.lemmapos2senses.values()))))
 
 
 class XlWSDSenseInventory(SenseInventory):

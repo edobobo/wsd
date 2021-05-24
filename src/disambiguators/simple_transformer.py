@@ -7,7 +7,13 @@ from transformers import AutoModel
 
 class TextEncoder(ABC, torch.nn.Module):
     @abstractmethod
-    def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor, instances_offsets: List[List[Tuple[int, int]]], **kwargs) -> torch.Tensor:
+    def forward(
+        self,
+        input_ids: torch.Tensor,
+        attention_mask: torch.Tensor,
+        instances_offsets: List[List[Tuple[int, int]]],
+        **kwargs
+    ) -> torch.Tensor:
         raise NotImplementedError
 
     @abstractmethod
@@ -37,14 +43,24 @@ class Disambiguator(torch.nn.Module):
         self.classification_head = classification_head
 
     def forward(
-        self, input_ids: str, attention_mask: str, instances_offsets: List[List[Tuple[int, int]]], labels: Optional[torch.Tensor] = None, **kwargs
+        self,
+        input_ids: str,
+        attention_mask: str,
+        instances_offsets: List[List[Tuple[int, int]]],
+        labels: Optional[torch.Tensor] = None,
+        **kwargs
     ) -> ClassificationOutput:
         encoded_sequence = self.encoder(input_ids, attention_mask, instances_offsets, **kwargs)
         return self.classification_head(encoded_sequence, labels, **kwargs)
 
 
 class TransformerEncoder(TextEncoder):
-    def __init__(self, transformer_model: str, fine_tune: bool, bpes_merging_strategy: Callable[[List[torch.Tensor]], torch.Tensor]):
+    def __init__(
+        self,
+        transformer_model: str,
+        fine_tune: bool,
+        bpes_merging_strategy: Callable[[List[torch.Tensor]], torch.Tensor],
+    ):
         super().__init__()
         self._encoder = AutoModel.from_pretrained(transformer_model)
 
@@ -102,9 +118,7 @@ class LinearClassificationHead(ClassificationHead):
             output_logits=forward_out,
             output_probs=torch.softmax(forward_out, dim=-1),
             output_predictions=torch.argmax(forward_out, dim=-1),
-            loss=self.criterion(forward_out.view(-1, output_size), labels.view(-1))
-            if labels is not None
-            else None,
+            loss=self.criterion(forward_out.view(-1, output_size), labels.view(-1)) if labels is not None else None,
         )
 
 
