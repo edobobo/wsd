@@ -60,7 +60,7 @@ class TransformerEncoder(TextEncoder):
         transformer_model: str,
         fine_tune: bool,
         bpes_merging_strategy: Callable[[List[torch.Tensor]], torch.Tensor],
-        use_last_n_layers: int = 1
+        use_last_n_layers: int = 1,
     ):
         super().__init__()
 
@@ -83,7 +83,7 @@ class TransformerEncoder(TextEncoder):
         instances_offsets: List[List[Tuple[int, int]]],
         **kwargs
     ) -> torch.Tensor:
-        encoded_bpes = torch.cat(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers:], dim=-1)
+        encoded_bpes = torch.cat(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers :], dim=-1)
 
         max_instances = max(map(len, instances_offsets))
         encoded_instances = torch.zeros(

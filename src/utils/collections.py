@@ -1,7 +1,7 @@
-from typing import List
+from typing import Iterable
 
 
-def flatten(lst: List[list]) -> list:
+def flatten(lst: Iterable[list]) -> list:
     return [_e for sub_l in lst for _e in sub_l]
 
 

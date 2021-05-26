@@ -59,9 +59,12 @@ class SimpleTransformerDataset(BaseDataset):
 
         for disambiguation_sentence in self.disambiguation_corpus:
 
-            input_ids, tokens_offsets = self.tokenizer.tokenize(
-                tokens=[di.text for di in disambiguation_sentence.instances]
-            )
+            tokenization_output = self.tokenizer.tokenize(tokens=[di.text for di in disambiguation_sentence.instances])
+
+            if tokenization_output is None:
+                continue
+
+            input_ids, tokens_offsets = tokenization_output
 
             attention_mask = torch.ones_like(input_ids)
 

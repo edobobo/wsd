@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 
 from nltk.corpus import wordnet as wn
 
@@ -51,12 +51,15 @@ class WordNetSenseInventory(SenseInventory):
         return sorted(list(set(flatten(self.lemmapos2senses.values()))))
 
 
-class XlWSDSenseInventory(SenseInventory):
-    def __init__(self, inventory_path: str, definitions_path: str):
+class BabelNetSenseInventory(SenseInventory):
+    def __init__(self, inventory_path: str, definitions_path: Optional[str] = None):
         self.lemmapos2synsets = dict()
         self._load_inventory(inventory_path)
         self.synset2definition = dict()
-        self._load_synset_definitions(definitions_path)
+
+        if definitions_path is not None:
+            self.synset2definition = dict()
+            self._load_synset_definitions(definitions_path)
 
     def _load_inventory(self, inventory_path: str) -> None:
         with open(inventory_path) as f:
@@ -76,12 +79,8 @@ class XlWSDSenseInventory(SenseInventory):
         return self.lemmapos2synsets.get((lemma.lower().replace(" ", "_"), pos), [])
 
     def get_definition(self, sense: str) -> str:
-        return self.synset2definition[sense]
+        if self.synset2definition is not None:
+            return self.synset2definition[sense]
 
-
-if __name__ == "__main__":
-    si = XlWSDSenseInventory("data/xl-wsd/inventories/inventory.it.txt", "data/xl-wsd.tsv")
-
-    synsets = si.get_possible_senses("fuoco", "n")
-    print(synsets)
-    print(si.get_definition(synsets[0]))
+    def get_all_senses(self) -> List[str]:
+        return sorted(list(set(flatten(self.lemmapos2synsets.values()))))

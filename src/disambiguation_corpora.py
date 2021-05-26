@@ -99,11 +99,7 @@ class WordNetCorpus(DisambiguationCorpus):
 
     def __iter__(self) -> Iterator[DisambiguationSentence]:
 
-        raganato_iterator = (
-            self.dataset_store
-            if self.dataset_store is not None
-            else self.read_dataset()
-        )
+        raganato_iterator = self.dataset_store if self.dataset_store is not None else self.read_dataset()
 
         for document_id, sentence_id, wsd_sentence in raganato_iterator:
 

@@ -1,0 +1,17 @@
+sense_inventory:
+  _target_: src.sense_inventories.BabelNetSenseInventory
+  inventory_path: "data/xl-wsd/inventories/inventory.en.txt"
+
+callbacks:
+  - _target_: src.pl_callbacks.raganato.PredictorsRaganatoEvaluateCallback
+    raganato_path: "data/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2007_babelnet/semeval2007"
+    wsd_framework_dir: data/WSD_Evaluation_Framework
+    predictors:
+      predictor:
+        _target_: src.predictors.simple_transformer.SimpleTransformerPredictor
+        module: null
+        tokenizer: null
+        sense_inventory: ${callbacks.sense_inventory}
+        sense_vocabulary: null
+        cat_senses: True
+        tokens_per_batch: 4096

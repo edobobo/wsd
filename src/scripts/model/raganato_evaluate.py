@@ -8,7 +8,7 @@ from src.utils.wsd import framework_evaluate
 
 
 def load_module(module_class_full_name: str):
-    parts = module_class_full_name.split('.')
+    parts = module_class_full_name.split(".")
     module = ".".join(parts[:-1])
     m = __import__(module)
     for comp in parts[1:]:

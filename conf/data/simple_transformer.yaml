@@ -9,7 +9,7 @@ train_dataset:
   _target_: src.datasets.simple_transformer.SimpleTransformerDataset
   disambiguation_corpus:
     _target_: src.disambiguation_corpora.WordNetCorpus
-    raganato_path: "data/WSD_Evaluation_Framework/Training_Corpora/SemCor/semcor"
+    raganato_path: "/media/ssd/commonsense/experiments/generation/semcor+cell_v2/semcor+cell_v2"
     materialize: False
     cached: False
     shuffle: False

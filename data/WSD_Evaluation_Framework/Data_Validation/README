@@ -1,0 +1,101 @@
+=================================================================================================================================
+						WORD SENSE DISAMBIGUATION
+				A UNIFIED EVALUATION FRAMEWORK AND EMPIRICAL COMPARISON
+
+				Alessandro Raganato, Jose Camacho-Collados and Roberto Navigli
+=================================================================================================================================
+
+
+This README contains the guidelines for releasing your sense-annotated data (for either training or evaluation purposes) in a
+standard unified format. 
+
+Each dataset should of a data file in XML ("[dataset].data.xml") and a gold file in .txt ("[dataset].gold.key.txt"). In the 
+original framework all the senses were annotated with WordNet 3.0 in the gold standard, but this schema may be used for other 
+sense inventories and languages other than English as well. See sample "sample-dataset" for an example from the unified framework.
+
+---Data--- 
+The XML data file should contain the following tags (in this order): corpus -> text -> sentence. Then, each sentences consists 
+of "wf" (non-disambiguated) and "instance" (disambiguated) tags. Both types should contain two mandatory attributes ("lemma" and
+ "pos"). "instance" should additionally contain an id, which should be present in the gold file. We recommend to use Stanford 
+CoreNLP pipeline for preprocessing (for the languages for which it is available). The "pos" tag (Part-of-Speech), should follow 
+the Universal PoS tags (http://universaldependencies.org/u/pos/index.html). Note that it is possible to add additional attributes 
+if needed (e.g. fine-grained PoS tags). See the file "schema.xsd" included in this directory for more details.
+
+---Gold--- 
+The .txt gold file should contain all the disambiguation instances included in the XML. Each line is space-separated, where the 
+first column corresponds to the instance id and the remaining columns correspond to the gold key/s.
+
+Additionally, this package includes two scripts to validate the conformity to the guidelines.
+
+* ValidateXML.java
+
+* ValidateGold.java
+
+=================================================================================================================================
+ValidateXML.java
+=================================================================================================================================
+
+This script verifies that the XML requirements have been followed the schema ("shchema.xsd" in this directory). See above for
+more details on how to format your XML.
+
+To use this script, you first need to compile it by typing the following command in the terminal:
+
+	$ javac ValidateXML.java
+
+Then, check that your dataset have followed the schema by typying: java ValidateXML XML_file schema.xsd
+
+Example of usage:
+
+	$ java ValidateXML sample-dataset/semeval2015.data.xml schema.xsd
+
+If the XML file has not followed the requirements, the script will refer you to the first line in which an error was found.
+
+=================================================================================================================================
+ValidateGold.java
+=================================================================================================================================
+
+This script verifies that the ids from the gold standard and the data file do not differ. 
+
+To use this script, you first need to compile it by typing the following command in the terminal::
+
+	$ javac -cp "lib/*" ValidateGold.java
+
+Then, type the following: java -cp "lib/*:." ValidateGold gold_file XML_file [wn30 candidatesWN30.txt]
+
+Example of usage:
+
+	$ java -cp "lib/*:." ValidateGold sample-dataset/semeval2015.data.xml sample-dataset/semeval2015.gold.key.txt
+
+The last optional parameters ("wn30" and "candidatesWN30.txt") are applicable only when your senses are annotated with WordNet 3.0. 
+The script will check that the PoS tag of the XML file and the gold file match, and will check that all gold keys are in fact 
+candidate synsets from the given lemma in WordNet 3.0.
+
+Example of usage (WordNet 3.0):
+
+	$ java -cp "lib/*:." ValidateGold sample-dataset/semeval2015.data.xml sample-dataset/semeval2015.gold.key.txt wn30 candidatesWN30.txt
+
+If some error was found, it will be printed in the console.
+
+=================================================================================================================================
+REFERENCE PAPER
+=================================================================================================================================
+
+When using these resources, please refer to the following paper (included in the package as "EACL17_WSD_EvaluationFramework.pdf"):
+
+	Alessandro Raganato, Jose Camacho-Collados and Roberto Navigli. 
+	Word Sense Disambiguation: A Unified Evaluation Framework and Empirical Comparison
+	In Proceedings of European Chapter of the Association for Computational Linguistics (EACL), 
+	Valencia, Spain, April 3-7, 2017. 
+
+=================================================================================================================================
+CONTACT
+=================================================================================================================================
+ 
+If you have enquiries about any of the resources, please join our Google Group: 
+https://groups.google.com/group/wsd-evaluationframework
+
+Alternatively, please contact Jose Camacho Collados (collados [at] di.uniroma1 [dot] it) or 
+Alessandro Raganato (raganato [at] di.uniroma1 [dot] it).
+
+=================================================================================================================================
+

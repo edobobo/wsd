@@ -1,0 +1,45 @@
+pl_data_module:
+  _target_: src.pl_data_modules.simple_transformer.SimpleTransformerPLDataModule
+
+sense_inventory:
+  _target_: src.sense_inventories.BabelNetSenseInventory
+  inventory_path: "data/xl-wsd/inventories/inventory.en.txt"
+
+train_dataset:
+  _target_: src.datasets.simple_transformer.SimpleTransformerDataset
+  disambiguation_corpus:
+    _target_: src.disambiguation_corpora.WordNetCorpus
+    raganato_path: "data/WSD_Evaluation_Framework/Training_Corpora/SemCor_babelnet/semcor"
+    materialize: False
+    cached: False
+    shuffle: False
+    is_doc_based: True
+    is_train: True
+  tokens_per_batch: 1536
+  max_batch_size: 120
+  main_field: input_ids
+  section_size: -1
+  prebatch: True
+  shuffle: True
+
+validation_dataset:
+  _target_: src.datasets.simple_transformer.SimpleTransformerDataset
+  disambiguation_corpus:
+    _target_: src.disambiguation_corpora.WordNetCorpus
+    raganato_path: "data/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2007_babelnet/semeval2007"
+    materialize: False
+    cached: False
+    shuffle: False
+    is_doc_based: True
+    is_train: True
+  tokens_per_batch: 4096
+  max_batch_size: 120
+  main_field: input_ids
+  section_size: -1
+  prebatch: True
+  shuffle: True
+
+num_workers: 0
+
+# this will be set by the data_module
+output_vocab_size: null

@@ -1,4 +1,4 @@
-from typing import List, NamedTuple, Tuple
+from typing import List, NamedTuple, Tuple, Optional
 
 import torch
 from transformers import AutoTokenizer
@@ -13,12 +13,17 @@ class SimpleTransformerTokenizer:
     def __init__(self, transformer_model: str):
         self.tokenizer = AutoTokenizer.from_pretrained(transformer_model, use_fast=True)
 
-    def tokenize(self, tokens: List[str]) -> TokenizationOutput:
-        tok_encoding = self.tokenizer.encode_plus(" ".join(tokens), return_tensors="pt")
-        tokenization_output = TokenizationOutput(
-            input_ids=tok_encoding.input_ids.squeeze(0),
-            tokens_offsets=[tuple(tok_encoding.word_to_tokens(wi)) for wi in range(len(tokens))],
-        )
+    def tokenize(self, tokens: List[str]) -> Optional[TokenizationOutput]:
+        tok_encoding = self.tokenizer.encode_plus(tokens, return_tensors="pt", is_split_into_words=True)
+        try:
+            tokenization_output = TokenizationOutput(
+                input_ids=tok_encoding.input_ids.squeeze(0),
+                tokens_offsets=[tuple(tok_encoding.word_to_tokens(wi)) for wi in range(len(tokens))],
+            )
+        except TypeError:
+            print(f"Tokenization failed for tokens: {' | '.join(tokens)}")
+            return None
+
         return tokenization_output
 
     @property

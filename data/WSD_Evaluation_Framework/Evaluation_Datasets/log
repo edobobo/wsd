@@ -1,0 +1,37 @@
+2020-09-07 16:40:19,917 - INFO - mulan.__main__ - strategy is do-them-all: iterating on all strategies
+2020-09-07 16:40:19,917 - INFO - mulan.__main__ - processing testing paths with strategy all
+2020-09-07 16:40:19,918 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:20,078 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 7253 instances
+2020-09-07 16:40:20,650 - INFO - mulan.__main__ - processing testing paths with strategy noun-only
+2020-09-07 16:40:20,650 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:20,865 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 4300 instances
+2020-09-07 16:40:21,438 - INFO - mulan.__main__ - processing testing paths with strategy verb-only
+2020-09-07 16:40:21,438 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:21,624 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 1652 instances
+2020-09-07 16:40:22,226 - INFO - mulan.__main__ - processing testing paths with strategy adj-only
+2020-09-07 16:40:22,227 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:22,335 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 955 instances
+2020-09-07 16:40:22,998 - INFO - mulan.__main__ - processing testing paths with strategy adv-only
+2020-09-07 16:40:22,998 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:23,102 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 346 instances
+2020-09-07 16:40:23,692 - INFO - mulan.__main__ - processing testing paths with strategy mfs
+2020-09-07 16:40:26,973 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:27,110 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 4170 instances
+2020-09-07 16:40:27,757 - INFO - mulan.__main__ - processing testing paths with strategy lfs+0
+2020-09-07 16:40:30,562 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:30,705 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 2413 instances
+2020-09-07 16:40:31,346 - INFO - mulan.__main__ - processing testing paths with strategy lfs
+2020-09-07 16:40:34,255 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:34,419 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 1945 instances
+2020-09-07 16:40:35,064 - INFO - mulan.__main__ - processing testing paths with strategy unseen-words
+2020-09-07 16:40:37,714 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:37,870 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 913 instances
+2020-09-07 16:40:38,755 - INFO - mulan.__main__ - processing testing paths with strategy unseen-lemmapos
+2020-09-07 16:40:41,616 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:41,750 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 670 instances
+2020-09-07 16:40:42,330 - INFO - mulan.__main__ - processing testing paths with strategy unseen-synset
+2020-09-07 16:40:51,432 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:51,675 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 887 instances
+2020-09-07 16:40:52,294 - INFO - mulan.__main__ - processing testing paths with strategy unseen-sense-seen-synset
+2020-09-07 16:40:55,708 - INFO - mulan.__main__ - doing file: data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL
+2020-09-07 16:40:55,831 - INFO - mulan.__main__ - file data/wsd-datasets/WSD_Unified_Evaluation_Datasets/ALL/ALL processed: 7253 -> 251 instances
