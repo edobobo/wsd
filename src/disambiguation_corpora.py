@@ -3,13 +3,14 @@ import re
 import string
 
 from abc import ABC, abstractmethod
-from typing import NamedTuple, Optional, List, Iterator, Tuple
+from typing import NamedTuple, Optional, List, Iterator, Iterable, Tuple, Union
 import collections
+from itertools import chain
 
 import numpy as np
 import torch
 
-from src.utils.wsd import read_from_raganato, expand_raganato_path, pos_map
+from src.utils.wsd import read_from_raganato, expand_raganato_path, pos_map, WSDInstance
 
 
 logger = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ class DisambiguationCorpus(ABC):
 class WordNetCorpus(DisambiguationCorpus):
     def __init__(
         self,
-        raganato_path: str,
+        raganato_path: Union[str, List[str]],
         materialize: bool = False,
         cached: bool = False,
         shuffle: bool = False,
@@ -72,7 +73,7 @@ class WordNetCorpus(DisambiguationCorpus):
         self.is_doc_based = is_doc_based
         self.is_train = is_train
 
-        if materialize:
+        if materialize or shuffle:
             self.materialize_dataset()
             if shuffle:
                 np.random.shuffle(self.dataset_store)
@@ -82,20 +83,26 @@ class WordNetCorpus(DisambiguationCorpus):
         self.doc2sent_order = None
         self.sentences_index = None
 
+    def read_dataset(self) -> Iterable[Tuple[str, str, List[WSDInstance]]]:
+        raganato_path = self.raganato_path
+        if type(raganato_path) == str:
+            raganato_path = [raganato_path]
+        return chain(*[read_from_raganato(*expand_raganato_path(rp)) for rp in raganato_path])
+
     def materialize_dataset(self) -> None:
         self.logger.info("Materializing raganato dataset")
 
         if self.cached:
             self.dataset_store = torch.load(f"{self.raganato_path}.pickle")
         else:
-            self.dataset_store = list(read_from_raganato(*expand_raganato_path(self.raganato_path)))
+            self.dataset_store = list(self.read_dataset())
 
     def __iter__(self) -> Iterator[DisambiguationSentence]:
 
         raganato_iterator = (
             self.dataset_store
             if self.dataset_store is not None
-            else read_from_raganato(*expand_raganato_path(self.raganato_path))
+            else self.read_dataset()
         )
 
         for document_id, sentence_id, wsd_sentence in raganato_iterator:
