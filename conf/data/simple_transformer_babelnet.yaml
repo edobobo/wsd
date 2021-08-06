@@ -5,6 +5,13 @@ sense_inventory:
   _target_: src.sense_inventories.BabelNetSenseInventory
   inventory_path: "data/xl-wsd/inventories/inventory.en.txt"
 
+sense_vocabulary:
+  _target_: src.utils.sense_vocabulary.SenseVocabulary.from_sense_inventory_and_disambiguation_corpora
+  sense_inventory: ${data.sense_inventory}
+  disambiguation_corpora:
+    - ${data.train_dataset.disambiguation_corpus}
+    - ${data.validation_dataset.disambiguation_corpus}
+
 train_dataset:
   _target_: src.datasets.simple_transformer.SimpleTransformerDataset
   disambiguation_corpus:

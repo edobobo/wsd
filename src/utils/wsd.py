@@ -181,7 +181,7 @@ class RaganatoBuilder:
         with tempfile.TemporaryDirectory() as tmp_dir:
             with open(f"{tmp_dir}/tmp.xml", "wb") as f_xml:
                 corpus_writer.write(f_xml, encoding="UTF-8", xml_declaration=True)
-            execute_bash_command(f" xmllint --format {tmp_dir}/tmp.xml > {output_path}")
+            execute_bash_command(f"xmllint --format {tmp_dir}/tmp.xml > {output_path}")
 
     def __store_labels(self, output_path: str):
         with open(output_path, "w") as f_labels:
@@ -190,7 +190,7 @@ class RaganatoBuilder:
                 f_labels.write("\n")
 
 
-def framework_evaluate(framework_folder: str, gold_file_path: str, pred_file_path: str) -> Tuple[float, float, float]:
+def raganato_framework_evaluate(framework_folder: str, gold_file_path: str, pred_file_path: str) -> Tuple[float, float, float]:
     scorer_folder = f"{framework_folder}/Evaluation_Datasets"
     command_output = execute_bash_command(
         f"[ ! -e {scorer_folder}/Scorer.class ] && javac -d {scorer_folder} {scorer_folder}/Scorer.java; java -cp {scorer_folder} Scorer {gold_file_path} {pred_file_path}"
@@ -198,3 +198,11 @@ def framework_evaluate(framework_folder: str, gold_file_path: str, pred_file_pat
     command_output = command_output.split("\n")
     p, r, f1 = [float(command_output[i].split("=")[-1].strip()[:-1]) for i in range(3)]
     return p, r, f1
+
+
+def xlwsd_framework_evaluate(framework_folder: str, gold_file_path: str, pred_file_path: str) -> float:
+    command_output = execute_bash_command(
+        f"/usr/bin/env python {framework_folder}/evaluate_answers.py --gold_file {gold_file_path} --answer_file {pred_file_path}"
+    )
+    command_output = command_output.split("\n")
+    return float(command_output[0].split(' ')[1])

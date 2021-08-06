@@ -3,15 +3,15 @@ sense_inventory:
   wn_candidates_path: "data/WSD_Evaluation_Framework/Data_Validation/candidatesWN30.txt"
 
 callbacks:
-  - _target_: src.pl_callbacks.raganato.PredictorsRaganatoEvaluateCallback
+  - _target_: src.pl_callbacks.framework_evaluation.RaganatoEvaluationCallback
     raganato_path: "data/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2007/semeval2007"
-    wsd_framework_dir: data/WSD_Evaluation_Framework
+    framework_dir: data/WSD_Evaluation_Framework
     predictors:
       predictor:
         _target_: src.predictors.simple_transformer.SimpleTransformerPredictor
         module: null
         tokenizer: null
         sense_inventory: ${callbacks.sense_inventory}
-        sense_vocabulary: null
-        cat_senses: True
+        sense_vocabulary_path: sense_vocabulary.txt  # todo code quality
+        cut_senses: True
         tokens_per_batch: 4096

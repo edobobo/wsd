@@ -5,6 +5,7 @@ import pytorch_lightning as pl
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
+from src.sense_inventories import SenseInventory
 from src.utils.sense_vocabulary import SenseVocabulary
 
 
@@ -16,7 +17,8 @@ class SimpleTransformerPLDataModule(pl.LightningDataModule):
         self.validation_dataset = None
         self.tokenizer = hydra.utils.instantiate(self.conf.tokenizer.simple_transformer_tokenizer)
         self.sense_inventory = hydra.utils.instantiate(self.conf.data.sense_inventory)
-        self.sense_vocabulary = SenseVocabulary.from_sense_inventory(self.sense_inventory)
+        self.sense_vocabulary = hydra.utils.instantiate(self.conf.data.sense_vocabulary)
+        self.sense_vocabulary.save('sense_vocabulary.txt')
         self.conf.data.output_vocab_size = len(self.sense_vocabulary)
 
     def setup(self, stage: Optional[str] = None):

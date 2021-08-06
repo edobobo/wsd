@@ -1,11 +1,11 @@
 sense_inventory:
   _target_: src.sense_inventories.BabelNetSenseInventory
-  inventory_path: "data/xl-wsd/inventories/inventory.en.txt"
+  inventory_path: data/xl-wsd/inventories/inventory.${oc.env:XL_WSD_LANGUAGE}.txt
 
 callbacks:
-  - _target_: src.pl_callbacks.framework_evaluation.RaganatoEvaluationCallback
-    raganato_path: "data/WSD_Evaluation_Framework/Evaluation_Datasets/semeval2007_babelnet/semeval2007"
-    framework_dir: data/WSD_Evaluation_Framework
+  - _target_: src.pl_callbacks.framework_evaluation.XLWSDEvaluationCallback
+    raganato_path: data/xl-wsd/evaluation_datasets/dev-${oc.env:XL_WSD_LANGUAGE}/dev-${oc.env:XL_WSD_LANGUAGE}
+    framework_dir: data/xl-wsd
     predictors:
       predictor:
         _target_: src.predictors.simple_transformer.SimpleTransformerPredictor

@@ -1,16 +1,12 @@
-from abc import ABC, abstractmethod
-from typing import Callable, Iterable, List, Any, Tuple, Dict, Union, Optional
+import logging
+from typing import Callable, Iterable, List, Any, Dict, Union, Optional
 
 import numpy as np
 import torch
-
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import IterableDataset
 
 from src.utils.collections import chunks, flatten
-
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -164,9 +160,11 @@ class BaseDataset(IterableDataset):
 
             current_dataset_elements.append(dataset_elem)
 
-            if i % 10_000 == 0:
+            if i % 100_000 == 0:
                 logger.info(f"Processed: {i} number of elements")
 
         if len(current_dataset_elements) != 0:
             for batch in self.materialize_batches(current_dataset_elements):
                 yield batch
+
+        logger.info(f"Dataset finished: {i} number of elements processed")

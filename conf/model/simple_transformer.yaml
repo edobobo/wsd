@@ -11,6 +11,7 @@ text_encoder:
   bpes_merging_strategy:
     _target_: src.disambiguators.simple_transformer.AverageBPES
   use_last_n_layers: 4
+  layer_merging_strategy: sum
 
 classification_head:
   _target_: src.disambiguators.simple_transformer.LinearClassificationHead

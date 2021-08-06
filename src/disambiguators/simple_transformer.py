@@ -61,6 +61,7 @@ class TransformerEncoder(TextEncoder):
         fine_tune: bool,
         bpes_merging_strategy: Callable[[List[torch.Tensor]], torch.Tensor],
         use_last_n_layers: int = 1,
+        layer_merging_strategy: str = 'cat'
     ):
         super().__init__()
 
@@ -75,6 +76,9 @@ class TransformerEncoder(TextEncoder):
 
         self.bpes_merging_strategy = bpes_merging_strategy
         self.use_last_n_layers = use_last_n_layers
+        if layer_merging_strategy not in ['cat', 'sum']:
+            raise NotImplementedError(f'layer_merging_strategy {layer_merging_strategy} not implemented')
+        self.layer_merging_strategy = layer_merging_strategy
 
     def forward(
         self,
@@ -83,7 +87,14 @@ class TransformerEncoder(TextEncoder):
         instances_offsets: List[List[Tuple[int, int]]],
         **kwargs
     ) -> torch.Tensor:
-        encoded_bpes = torch.cat(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers :], dim=-1)
+
+        # todo make it a param
+        if self.layer_merging_strategy == 'cat':
+            encoded_bpes = torch.cat(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers :], dim=-1)
+        elif self.layer_merging_strategy == 'sum':
+            encoded_bpes = torch.stack(self._encoder(input_ids, attention_mask)[2][-self.use_last_n_layers :], dim=-1).sum(-1)
+        else:
+            raise NotImplementedError(f'layer_merging_strategy {self.layer_merging_strategy} not implemented')
 
         max_instances = max(map(len, instances_offsets))
         encoded_instances = torch.zeros(
@@ -99,7 +110,12 @@ class TransformerEncoder(TextEncoder):
         return encoded_instances
 
     def hidden_size(self) -> int:
-        return self._encoder.config.hidden_size * self.use_last_n_layers
+        if self.layer_merging_strategy == 'cat':
+            return self._encoder.config.hidden_size * self.use_last_n_layers
+        elif self.layer_merging_strategy == 'sum':
+            return self._encoder.config.hidden_size
+        else:
+            raise NotImplementedError(f'layer_merging_strategy {self.layer_merging_strategy} not implemented')
 
 
 class LinearClassificationHead(ClassificationHead):
@@ -126,6 +142,38 @@ class LinearClassificationHead(ClassificationHead):
             output_probs=torch.softmax(forward_out, dim=-1),
             output_predictions=torch.argmax(forward_out, dim=-1),
             loss=self.criterion(forward_out.view(-1, output_size), labels.view(-1)) if labels is not None else None,
+        )
+
+
+class BevilacquaClassificationHead(ClassificationHead):
+    def __init__(self, hidden_size: int, output_vocab_size: int):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.batch_norm = torch.nn.BatchNorm1d(hidden_size)
+        self.classifier = torch.nn.Sequential(
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.nn.SiLU(),
+            torch.nn.Linear(hidden_size, output_vocab_size, bias=False),
+        )
+        self.criterion = torch.nn.CrossEntropyLoss()
+
+    def forward(
+        self, encoded_instances: torch.Tensor, labels: Optional[torch.Tensor], **kwargs
+    ) -> ClassificationOutput:
+
+        flattened_encoded_instances = encoded_instances.view(-1, self.hidden_size)
+        if flattened_encoded_instances.shape[0] > 1:
+            flattened_encoded_instances = self.batch_norm(flattened_encoded_instances)
+
+        flattened_forward_out = self.classifier(flattened_encoded_instances)
+        loss = self.criterion(flattened_forward_out, labels.view(-1)) if labels is not None else None
+        forward_out = flattened_forward_out.view(encoded_instances.shape[0], encoded_instances.shape[1], -1)
+
+        return ClassificationOutput(
+            output_logits=forward_out,
+            output_probs=torch.softmax(forward_out, dim=-1),
+            output_predictions=torch.argmax(forward_out, dim=-1),
+            loss=loss
         )
 
 

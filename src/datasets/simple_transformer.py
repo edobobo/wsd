@@ -1,3 +1,4 @@
+import logging
 import random
 from typing import List, Optional, Iterable, Dict, Any
 
@@ -8,6 +9,9 @@ from src.sense_inventories import SenseInventory
 from src.tokenizers.simple_transformer import SimpleTransformerTokenizer
 from src.utils.base_dataset import BaseDataset, batchify
 from src.utils.sense_vocabulary import SenseVocabulary
+
+
+logger = logging.getLogger(__name__)
 
 
 class SimpleTransformerDataset(BaseDataset):
@@ -65,14 +69,26 @@ class SimpleTransformerDataset(BaseDataset):
                 continue
 
             input_ids, tokens_offsets = tokenization_output
-
             attention_mask = torch.ones_like(input_ids)
 
-            instances_offsets = [
-                tokens_offsets[i]
-                for i, di in enumerate(disambiguation_sentence.instances)
-                if di.instance_id is not None
-            ]
+            labels, encoded_labels = [], []
+            comprehensive_labels = []
+            instances_offsets = []
+
+            for i, disambiguation_instance in enumerate(disambiguation_sentence.instances):
+                # the two different if branches are needed to handle the fact that, at prediction time, .labels will be empty
+                if disambiguation_instance.labels is not None:
+                    try:
+                        _labels = [(l, self.sense_vocabulary.get_index(l)) for l in disambiguation_instance.labels]
+                        l, el = random.choice([(l, el) for l, el in _labels if el is not None])
+                        labels.append(l)
+                        encoded_labels.append(el)
+                        comprehensive_labels.append(disambiguation_instance.labels)
+                    except IndexError:
+                        logger.warning(f'Instance discarded as no label in {disambiguation_instance.labels} was found in sense vocabulary')
+                        continue
+                if disambiguation_instance.instance_id is not None:
+                    instances_offsets.append(tokens_offsets[i])
 
             if len(instances_offsets) == 0:
                 continue
@@ -87,15 +103,8 @@ class SimpleTransformerDataset(BaseDataset):
                 "possible_candidates": [
                     self.sense_inventory.get_possible_senses(di.lemma, di.pos) if di.instance_id is not None else None
                     for di in disambiguation_sentence.instances
-                ],
+                ]
             }
-
-            labels = []
-            comprehensive_labels = []
-            for disambiguation_instance in disambiguation_sentence.instances:
-                if disambiguation_instance.labels is not None:
-                    labels.append(random.choice(disambiguation_instance.labels))
-                    comprehensive_labels.append(disambiguation_instance.labels)
 
             if len(labels) > 0:
                 batch_elem["labels"] = torch.tensor(

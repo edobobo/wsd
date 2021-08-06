@@ -20,8 +20,8 @@ class SimpleTransformerPredictor(BasePredictor):
         module: Optional[Union[str, SimpleTransformerPLModule]],
         tokenizer: Optional[SimpleTransformerTokenizer],
         sense_inventory: SenseInventory,
-        sense_vocabulary: Optional[SenseVocabulary],
-        cat_senses: bool,
+        sense_vocabulary_path: str,
+        cut_senses: bool,
         tokens_per_batch: int,
         max_batch_size: int = 120,
         main_field: str = "input_ids",
@@ -32,12 +32,8 @@ class SimpleTransformerPredictor(BasePredictor):
         enable_autocast: bool = True,
     ):
         self.sense_inventory = sense_inventory
-        self.sense_vocabulary = (
-            sense_vocabulary
-            if sense_vocabulary is not None
-            else SenseVocabulary.from_sense_inventory(self.sense_inventory)
-        )
-        self.cat_senses = cat_senses
+        self.sense_vocabulary = SenseVocabulary.load(sense_vocabulary_path)
+        self.cut_senses = cut_senses
         self.tokens_per_batch = tokens_per_batch
         self.max_batch_size = max_batch_size
         self.main_field = main_field
@@ -61,7 +57,6 @@ class SimpleTransformerPredictor(BasePredictor):
             module = SimpleTransformerPLModule.load_from_checkpoint(module)
             module.to(self.device)
             module.freeze()
-
         return module
 
     def load_tokenizer(self, tokenizer: Optional[SimpleTransformerTokenizer]) -> SimpleTransformerTokenizer:
@@ -112,7 +107,7 @@ class SimpleTransformerPredictor(BasePredictor):
                             if instance_id is None:
                                 continue
 
-                            if self.cat_senses:
+                            if self.cut_senses:
                                 predicted_sense = max(
                                     instance_possible_candidates,
                                     key=lambda ipc: sense_probabilities[self.sense_vocabulary.get_index(ipc)],
